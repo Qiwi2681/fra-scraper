@@ -1,11 +1,11 @@
 import pickle
-"""memory efficient class to manage urls"""
 
-
+# memory efficent url filter
 class URLDatabase():
     def __init__(self, filename):
         self.filename = filename + '.pkl'
         self.current = set()
+        self.seen = set()
 
     # loads the bytestream to memory in self.seen
     def load(self):
@@ -24,3 +24,26 @@ class URLDatabase():
         with open(self.filename, 'wb') as file:
             pickle.dump(data, file)
         self.seen = set()
+
+    # load seen urls, update the sets, return uniques
+    def update(self, method, *args):
+        # get current set
+        self.current = method(*args)
+
+        # load seen from .pkl
+        try:
+            if self.seen == {}:
+                self.load()
+        except AttributeError:
+            self.load()
+
+        # get 'new' urls
+        unique = self.current - self.seen
+
+        print(f'found {len(unique)} new urls')
+
+        # update seen & cleanup
+        self.seen.update(self.current)
+        self.save()
+
+        return unique
