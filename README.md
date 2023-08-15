@@ -1,7 +1,7 @@
 # fra-scraper
 "Fuck Reddit Admins(API)" Scraper
 
-Scrapes reddit pages to retrive thread text, and usernames
+Scrapes reddit pages to retrive thread text, and usernames.
 Focused on memory-optimisation and parralelization
 
 TODO:
