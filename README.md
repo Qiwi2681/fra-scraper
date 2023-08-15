@@ -6,8 +6,8 @@ Focused on memory-optimisation and parralelization
 
 TODO:
 1. rebalance url chunks between threads
-2. use requests instead of selenium for small posts
-    ^
+2. use requests instead of selenium for small posts/n
+    ^/n
     create cache of "long" threads to go over later
 3. scrape posts from users while waiting for new homepage results
 
