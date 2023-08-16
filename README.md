@@ -10,5 +10,6 @@ TODO:
     ^<br>
     create cache of "long" threads to go over later.
 3. scrape posts from users while waiting for new homepage results.
+4. Proxy rotation
 
-4. solution for raspberry pi.
+5. solution for raspberry pi.

@@ -12,10 +12,8 @@ class URLDatabase():
         try:
             with open(self.filename, 'rb') as file:
                 data = pickle.load(file)
-                # attribute is loaded regardless
                 self.seen = data.get('seen', set())
         except FileNotFoundError:
-            print(f'File not found: {self.filename}')
             self.seen = set()
 
     # dumps self.seen to bytestream and unloads the set from memory
@@ -29,19 +27,10 @@ class URLDatabase():
     def update(self, method, *args):
         # get current set
         self.current = method(*args)
-
         # load seen from .pkl
-        try:
-            if self.seen == {}:
-                self.load()
-        except AttributeError:
-            self.load()
-
+        self.load()
         # get 'new' urls
         unique = self.current - self.seen
-
-        print(f'found {len(unique)} new urls')
-
         # update seen & cleanup
         self.seen.update(self.current)
         self.save()
