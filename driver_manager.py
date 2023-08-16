@@ -1,3 +1,4 @@
+from typing import Any
 from selenium import webdriver
 from selenium.common import exceptions as se
 from selenium.webdriver.chrome.service import Service
@@ -10,6 +11,9 @@ class ParralelDriverManager():
         self.threads = threads
         self.options = self.get_options()
         self.drivers = []
+
+    def __getitem__(self, index):
+        return self.drivers[index]
 
     @staticmethod
     def get_options():
