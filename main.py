@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     #get urls
     subreddits = homepage.get_urls()
-    posts = subpage.getURLs(list(subreddits))
+    posts = subpage.get_urls(list(subreddits))
 
     #scrape
     scraper = post_scraper.PostScraper(threads=4)
