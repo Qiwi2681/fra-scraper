@@ -14,7 +14,7 @@ class URLDatabase():
                 data = pickle.load(file)
                 self.seen = data.get('seen', set())
         except FileNotFoundError:
-            self.seen = set()
+            pass
 
     # dumps self.seen to bytestream and unloads the set from memory
     def save(self):
