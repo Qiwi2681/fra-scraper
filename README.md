@@ -10,12 +10,12 @@ TODO:
 
 
 
-Done:
+v1.1:
 Rebalance url chunks between threads:<br>
     -get urls from a stack, avoid chunking data altogether<br>
 
 
-The solution(s) I can't do:
+Cant DO:
 1. use requests instead of selenium for small posts.<br>
     ^<br>
     create cache of "long" threads to go over later.
