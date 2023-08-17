@@ -5,16 +5,14 @@ Scrapes reddit pages to retrive thread text, and usernames.<br>
 Focused on memory-optimisation and parralelization.
 
 TODO:
-1. rebalance url chunks between threads.
-2. Proxy rotation
-3. scrape posts from users while waiting for new homepage results.
+1. Proxy rotation
+2. scrape posts from users while waiting for new homepage results.
 
 
 
-Working on:
-Rebalance url chunks between threads: 
-If we turn a fraction of the list into chunks at a time, the threads will be more likley to be synchronized
-If we get urls from a stack, we avoid chunking data altogether
+Done:
+Rebalance url chunks between threads:<br>
+    -get urls from a stack, avoid chunking data altogether<br>
 
 
 The solution(s) I can't do:
@@ -23,6 +21,6 @@ The solution(s) I can't do:
     create cache of "long" threads to go over later.
 
 Roadblock:
-Reddit has measures in place to prevent this.
-    -Comment numbers are obfuscaded, and decoded by javascript
-    -In addition to tags which interfere with bs4
+Reddit has measures in place to prevent this.<br>
+    -Comment numbers are obfuscaded, and decoded by javascript<br>
+    -In addition to tags which interfere with bs4<br>

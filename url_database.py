@@ -24,6 +24,12 @@ class URLDatabase():
             pickle.dump(data, file)
         self.seen = set()
 
+    def set_current(self, urls: set):
+        self.current = urls
+
+    def get_unique(self):
+        return self.current - self.seen
+
     # load seen urls, update the sets, return uniques
     def update(self, method, *args):
         # get current set
@@ -31,14 +37,13 @@ class URLDatabase():
         # load seen from .pkl
         self.load()
         # get 'new' urls
-        unique = self.current - self.seen
+        unique = self.get_unique()
         # update seen & cleanup
         self.seen.update(self.current)
         self.save()
 
         return unique
 
-    #method to clear the set
     def clear(self):
         if os.path.exists(self.filename):
             os.remove(self.filename)

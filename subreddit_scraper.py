@@ -9,10 +9,10 @@ import url_database
 import driver_manager
 
 
-def scroll_and_wait(driver, times):
+def scroll_and_wait(driver, scroll_times):
     last_height = driver.execute_script("return document.body.scrollHeight")
     i = 0
-    while i < times:
+    while i < scroll_times:
         # Check if the "View more comments" button is present
         load_more_button = None
         try:
