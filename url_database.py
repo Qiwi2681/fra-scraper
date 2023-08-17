@@ -1,3 +1,4 @@
+import os
 import pickle
 
 # memory efficent url filter
@@ -14,7 +15,7 @@ class URLDatabase():
                 data = pickle.load(file)
                 self.seen = data.get('seen', set())
         except FileNotFoundError:
-            pass
+            self.seen = set()
 
     # dumps self.seen to bytestream and unloads the set from memory
     def save(self):
@@ -36,3 +37,9 @@ class URLDatabase():
         self.save()
 
         return unique
+
+    #method to clear the set
+    def clear(self):
+        if os.path.exists(self.filename):
+            os.remove(self.filename)
+            self.seen = set()
