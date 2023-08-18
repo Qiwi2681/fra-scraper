@@ -28,17 +28,9 @@ class URLDatabase():
         self.current = urls
 
     def get_unique(self):
-        return self.current - self.seen
-
-    # load seen urls, update the sets, return uniques
-    def update(self, method, *args):
-        # get current set
-        self.current = method(*args)
-        # load seen from .pkl
         self.load()
-        # get 'new' urls
-        unique = self.get_unique()
-        # update seen & cleanup
+        unique = self.current - self.seen
+        print(self.current, self.seen)
         self.seen.update(self.current)
         self.save()
 

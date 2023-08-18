@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 import json
 import random
@@ -53,7 +54,7 @@ def scrape_reddit_thread_url(driver):
         clean_post_title = clean_post_title[:max_filename_length]
 
     comments = soup.find_all('p', class_='')
-    comments_text = ", ".join(comment.get_text(strip=True) for comment in comments)
+    comments_text = "<New Comment>".join(comment.get_text(strip=True) for comment in comments)
 
     users = soup.find_all(
         'a', class_='font-bold text-neutral-content-strong text-12 hover:underline')
@@ -79,18 +80,17 @@ class PostScraper():
         self.chrome_driver = driver_manager.ParralelDriverManager(threads)
         self.database = url_database.URLDatabase('seen_posts')
 
-    def scrape(self, urls: list):
+    def scrape(self, urls: set):
         # get unique urls
-        self.database.load()
         self.database.set_current(urls)
         urls = self.database.get_unique()
         if not urls:
             clear = input("Cannot find any unique post urls, type y to clear cache & retry: ")
-        if clear == 'y':
-            self.database.clear()
-            urls = self.database.get_unique()
-        else:
-            exit()
+            if clear == 'y':
+                self.database.clear()
+                urls = self.database.get_unique()
+            else:
+                sys.exit()
 
         #set unique urls
         self.chrome_driver.url_pool = list(urls)

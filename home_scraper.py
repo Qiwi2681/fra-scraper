@@ -1,51 +1,13 @@
 import re
-import time
-import random
-from concurrent.futures import ThreadPoolExecutor
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import sys
 
 from bs4 import BeautifulSoup
 
 import url_database
 import driver_manager
 
-
-REDDIT_URL = 'https://reddit.com'
-
-
-def scrape_subreddits(url, driver, scrolls_to_perform):
+def scrape_subreddits(driver):
     subreddit_set = set()
-
-    # Navigate to the current URL of the driver
-    driver.get(url)
-
-    # Define a function to scroll down the page and load more results
-    def scroll_and_wait(scrolls_to_perform):
-        last_height = driver.execute_script(
-            "return document.body.scrollHeight")
-        scrolls_done = 0
-        while scrolls_done < scrolls_to_perform:
-            driver.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);")
-            # Adjust the waiting time based on your network speed
-            time.sleep(random.randint(200, 300)/100)
-            new_height = driver.execute_script(
-                "return document.body.scrollHeight")
-            if new_height == last_height:
-                break
-            last_height = new_height
-            scrolls_done += 1
-
-    # Scroll down specified number of times to load more results
-    if scrolls_to_perform > 0:
-        scroll_and_wait(scrolls_to_perform)
-    else:
-        wait = WebDriverWait(driver, 10)  # Maximum wait time in seconds
-        wait.until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "div.font-semibold")))
 
     # Get the page source after scrolling
     page_source = driver.page_source
@@ -59,7 +21,7 @@ def scrape_subreddits(url, driver, scrolls_to_perform):
         href = a_tag.get("href")
         match = re.search(r'/r/([^/]+)/', href)
         if match:
-            subreddit_set.add(match.group(1))
+            subreddit_set.add('/r/' + match.group(1))
 
     return subreddit_set
 
@@ -72,35 +34,32 @@ class HomePageCrawler():
         self.threads = threads
 
         self.database = url_database.URLDatabase('seen_subs')
-        self.chrome_driver = driver_manager.ParralelDriverManager(threads)
+        self.chrome_driver = driver_manager.ParralelDriverManager(self.threads)
 
-    def get_urls(self) -> set:
-        return self.database.update(self.scrape)
 
     # scrape more URLs
     def scrape(self) -> set:
-        unique = set()
+        self.chrome_driver.populate_url_pool(['https://reddit.com']*self.threads)
 
-        # Start the drivers using ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=self.threads) as executor:
-            self.chrome_driver.start_drivers()
+        self.chrome_driver.parallel_url_task(self.chrome_driver.scroll_and_wait, self.scroll_number)
 
-            # Submit scrape tasks to the executor
-            scrape_tasks = [
-                executor.submit(self.scrape_subreddits,
-                                self.chrome_driver.drivers[i % self.threads])
-                for i in range(self.threads)
-            ]
+        self.chrome_driver.populate_url_pool(['https://reddit.com']*self.threads)
 
-            # Wait for all tasks to complete and gather results
-            for task in scrape_tasks:
-                scraped_urls = task.result()
-                unique.update(scraped_urls)
+        current = self.chrome_driver.parallel_url_task(scrape_subreddits)
 
-            # Stop the drivers
-            self.chrome_driver.stop_drivers()
+        print(current)
 
-        return unique
+        self.chrome_driver.stop_drivers()
 
-    def scrape_subreddits(self, driver):
-        return scrape_subreddits(REDDIT_URL, driver, self.scroll_number)
+        self.database.set_current(current)
+
+        subreddits = self.database.get_unique()
+
+        if not subreddits:
+            clear = input("Cannot find any unique subreddits, type y to clear cache & retry: ")
+            if clear == 'y':
+                self.database.clear()
+                subreddits = self.database.get_unique()
+            else:
+                sys.exit()
+        return  subreddits
